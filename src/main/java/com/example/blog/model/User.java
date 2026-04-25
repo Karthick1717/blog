@@ -29,7 +29,8 @@ public class User {
 
     @Column(unique = true)
     private String email;
-
+    
+    @JsonIgnore
     private String password;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
