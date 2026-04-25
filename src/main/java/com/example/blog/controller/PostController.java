@@ -1,9 +1,11 @@
 package com.example.blog.controller;
 
+import com.example.blog.dto.ApiResponse;
 import com.example.blog.dto.PostRequest;
 import com.example.blog.model.Post;
 import com.example.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -16,24 +18,30 @@ public class PostController {
 
     private final PostService postService;
 
-    // Create Post (SECURED)
     @PostMapping
-    public Post createPost(@RequestBody PostRequest request,
-                           Principal principal) {
-            System.out.println("Incoming email: " + principal.getName());
+    public ResponseEntity<ApiResponse<Post>> createPost(@RequestBody PostRequest request,
+                                                         Principal principal) {
 
-        return postService.createPost(request, principal.getName());
+        Post post = postService.createPost(request, principal.getName());
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(200, "Post created successfully", post)
+        );
     }
 
-    // Get all posts (public after login)
     @GetMapping
-    public List<Post> getAllPosts() {
-        return postService.getAllPosts();
+    public ResponseEntity<ApiResponse<List<Post>>> getAllPosts() {
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(200, "All posts fetched", postService.getAllPosts())
+        );
     }
 
-    // My posts
     @GetMapping("/my")
-    public List<Post> getMyPosts(Principal principal) {
-        return postService.getMyPosts(principal.getName());
+    public ResponseEntity<ApiResponse<List<Post>>> getMyPosts(Principal principal) {
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(200, "Your posts fetched", postService.getMyPosts(principal.getName()))
+        );
     }
 }

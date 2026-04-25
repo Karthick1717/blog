@@ -1,9 +1,11 @@
 package com.example.blog.controller;
 
+import com.example.blog.dto.ApiResponse;
 import com.example.blog.dto.CommentRequest;
 import com.example.blog.model.Comment;
 import com.example.blog.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -16,18 +18,26 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    // Add comment
+    // ✅ Add comment
     @PostMapping("/{postId}")
-    public Comment addComment(@PathVariable Long postId,
-                             @RequestBody CommentRequest request,
-                             Principal principal) {
+    public ResponseEntity<ApiResponse<Comment>> addComment(
+            @PathVariable Long postId,
+            @RequestBody CommentRequest request,
+            Principal principal) {
 
-        return commentService.addComment(postId, request, principal.getName());
+        Comment comment = commentService.addComment(postId, request, principal.getName());
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(200, "COMMENT_ADDED", comment)
+        );
     }
 
-    // Get comments for a post
+    // ✅ Get comments
     @GetMapping("/{postId}")
-    public List<Comment> getComments(@PathVariable Long postId) {
-        return commentService.getCommentsByPost(postId);
+    public ResponseEntity<ApiResponse<List<Comment>>> getComments(@PathVariable Long postId) {
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(200, "COMMENTS_FETCHED", commentService.getCommentsByPost(postId))
+        );
     }
 }

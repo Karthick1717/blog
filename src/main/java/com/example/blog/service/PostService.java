@@ -20,17 +20,20 @@ public class PostService {
 
     public Post createPost(PostRequest request, String email) {
 
-        // 🔥 Get logged-in user
+        if (request == null || request.getTitle() == null || request.getTitle().isBlank()) {
+            throw new RuntimeException("INVALID_POST_DATA");
+        }
+
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
 
         Post post = new Post();
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
-        post.setAuthor(user); 
+        post.setImage(request.getImage());
+        post.setAuthor(user);
         post.setCreatedAt(LocalDateTime.now());
         post.setUpdatedAt(LocalDateTime.now());
-        post.setImage(request.getImage());
 
         return postRepository.save(post);
     }
@@ -41,9 +44,13 @@ public class PostService {
 
     public List<Post> getMyPosts(String email) {
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (email == null || email.isBlank()) {
+            throw new RuntimeException("INVALID_USER");
+        }
 
-        return postRepository.findByAuthor(user); // ✅ FIXED
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+
+        return postRepository.findByAuthor(user);
     }
 }
