@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
@@ -7,29 +8,37 @@ import Signup from "./components/Signup";
 import Profile from "./components/Profile";
 // import CreatePost from "./components/CreatePost";
 
-// 🔐 Protected Route Component
-const PrivateRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/login" />;
+// 🔐 Protected Route
+const PrivateRoute = ({ children, isLoggedIn }) => {
+  return isLoggedIn ? children : <Navigate to="/login" />;
 };
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("token")
+  );
+
   return (
     <Router>
-      {/* Navbar visible everywhere except auth pages */}
-      <Navbar />
+      {/* ✅ pass state to Navbar */}
+      <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
 
       <Routes>
-        {/* Public Routes */}
+        {/* Public */}
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
+
+        <Route
+          path="/login"
+          element={<Login setIsLoggedIn={setIsLoggedIn} />}
+        />
+
         <Route path="/signup" element={<Signup />} />
 
-        {/* Protected Routes */}
+        {/* Protected */}
         <Route
           path="/create"
           element={
-            <PrivateRoute>
+            <PrivateRoute isLoggedIn={isLoggedIn}>
               {/* <CreatePost /> */}
             </PrivateRoute>
           }
@@ -38,13 +47,13 @@ function App() {
         <Route
           path="/profile"
           element={
-            <PrivateRoute>
+            <PrivateRoute isLoggedIn={isLoggedIn}>
               <Profile />
             </PrivateRoute>
           }
         />
 
-        {/* Fallback */}
+        {/* 404 */}
         <Route path="*" element={<h1 className="p-4">404 Not Found</h1>} />
       </Routes>
     </Router>

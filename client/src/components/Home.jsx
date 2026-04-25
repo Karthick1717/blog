@@ -1,16 +1,35 @@
+import { useEffect, useState } from "react";
+import API from "../services/api";
 import PostCard from "../components/PostCard";
-const demoPost = {
-  title: "Building a Modern Blog App",
-  author: "You",
-  content: "This is a sample post content to preview how the card looks...",
-  createdAt: new Date(),
-  likes: 10,
-  tag: "Tech",
-};
+
 const Home = () => {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await API.get("/api/posts", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setPosts(res.data.data);
+      } catch (err) {
+        console.error("Error fetching posts", err);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
   return (
-    <div className="grid max-w-6xl gap-6 p-4 mx-auto md:grid-cols-2 lg:grid-cols-3">
-      <PostCard post={demoPost} />
+    <div className="max-w-5xl p-4 mx-auto space-y-6">
+      {posts.map((post) => (
+        <PostCard key={post.id} post={post} />
+      ))}
     </div>
   );
 };

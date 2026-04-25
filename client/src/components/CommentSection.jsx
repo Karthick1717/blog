@@ -1,37 +1,37 @@
-import { useState} from "react";
+import { useState, useEffect, useCallback } from "react";
 import API from "../services/api";
 
 const CommentSection = ({ postId }) => {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
 
-//   // ✅ memoized function (prevents re-creation every render)
-//   const fetchComments = useCallback(async () => {
-//     try {
-//       const res = await API.get(`/comments/${postId}`);
-//       setComments(res.data);
-//     } catch (err) {
-//       console.error("Error fetching comments", err);
-//     }
-//   }, [postId]);
+  // Fetch comments
+  const fetchComments = useCallback(async () => {
+    try {
+      const res = await API.get(`/api/comments/${postId}`);
+      setComments(res.data.data);
+    } catch (err) {
+      console.error("Error fetching comments", err);
+    }
+  }, [postId]);
 
-//   useEffect(() => {
-//     if (!postId) return; // ✅ safety check
-//     fetchComments();
-//   }, [fetchComments]);
+  useEffect(() => {
+    if (!postId) return;
+    fetchComments();
+  }, [fetchComments]);
 
+  // Add comment
   const addComment = async () => {
     if (!text.trim()) return;
 
     try {
       await API.post(`/comments/${postId}`, { content: text });
 
-      // ✅ Optimistic update (better UX + avoids extra effect loops)
+      // Optimistic update
       setComments((prev) => [
         ...prev,
         {
           id: Date.now(),
-          author: "You",
           content: text,
         },
       ]);
@@ -46,6 +46,7 @@ const CommentSection = ({ postId }) => {
     <div className="mt-6">
       <h3 className="mb-3 text-lg font-semibold">Comments</h3>
 
+      {/* Input */}
       <div className="flex gap-2 mb-4">
         <input
           value={text}
@@ -61,16 +62,25 @@ const CommentSection = ({ postId }) => {
         </button>
       </div>
 
-      <div className="space-y-3">
-        {comments.map((c) => (
-          <div
-            key={c.id}
-            className="p-3 bg-white rounded-md dark:bg-gray-800 shadow-soft"
-          >
-            <p className="text-sm font-semibold">{c.author}</p>
-            <p className="text-gray-600 dark:text-gray-300">{c.content}</p>
-          </div>
-        ))}
+      {/* 🔥 Fixed Height + Scroll */}
+      <div className="pr-1 space-y-3 overflow-y-auto max-h-60 md:max-h-72">
+        {comments.length > 0 ? (
+          comments.map((c) => (
+            <div
+              key={c.id}
+              className="p-3 bg-white rounded-md dark:bg-gray-800 shadow-soft"
+            >
+              <p className="text-sm font-semibold">
+                {c.author?.username || "User"}
+              </p>
+              <p className="text-gray-600 dark:text-gray-300">
+                {c.content}
+              </p>
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-gray-500">No comments yet</p>
+        )}
       </div>
     </div>
   );

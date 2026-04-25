@@ -23,7 +23,7 @@ public class Comment {
 
     private LocalDateTime createdAt;
     
-    @JsonIgnore
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"posts", "comments", "email", "password"})
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
