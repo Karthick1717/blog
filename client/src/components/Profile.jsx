@@ -5,7 +5,7 @@ const Profile = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    API.get("/users/profile").then((res) => setUser(res.data));
+    API.get("api//users/profile").then((res) => setUser(res.data));
   }, []);
 
   if (!user) return <p className="p-4">Loading...</p>;
