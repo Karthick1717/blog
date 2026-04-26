@@ -1,14 +1,26 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
+import axios from "axios";
+
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(false);
+  
+  async function getProfile(){
+     const token=localStorage.getItem("token");
+    const response=await axios.get("http://localhost:8080/api/auth/profile",{
+      headers:{
+        Authorization:`Bearer ${token}`
+      }
+    });
+    console.log(response);
+  }
+   
+  useEffect(()=>{
+    getProfile()
+  },[])
 
-  useEffect(() => {
-    API.get("/users/me").then((res) => setUser(res.data));
-  }, []);
-
-  if (!user) return <p className="p-4">Loading...</p>;
+  if(!user) return <p className="p-4">Loading...</p>;
 
   return (
     <div className="max-w-4xl p-4 mx-auto">

@@ -6,7 +6,7 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Profile from "./components/Profile";
-// import CreatePost from "./components/CreatePost";
+import CreatePost from "./components/CreatePost";
 
 // 🔐 Protected Route
 const PrivateRoute = ({ children, isLoggedIn }) => {
@@ -39,7 +39,7 @@ function App() {
           path="/create"
           element={
             <PrivateRoute isLoggedIn={isLoggedIn}>
-              {/* <CreatePost /> */}
+              <CreatePost />
             </PrivateRoute>
           }
         />

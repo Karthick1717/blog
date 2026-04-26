@@ -6,6 +6,8 @@ import com.example.blog.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.blog.model.User;
+
 import java.util.Map;
 
 @RestController
@@ -25,4 +27,5 @@ public class AuthController {
         String token = authService.login(request);
         return Map.of("token", token);
     }
+    
 }

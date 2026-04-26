@@ -25,7 +25,7 @@ const CommentSection = ({ postId }) => {
     if (!text.trim()) return;
 
     try {
-      await API.post(`/comments/${postId}`, { content: text });
+      await API.post(`/api/comments/${postId}`, { content: text });
 
       // Optimistic update
       setComments((prev) => [
@@ -35,7 +35,7 @@ const CommentSection = ({ postId }) => {
           content: text,
         },
       ]);
-
+      fetchComments();
       setText("");
     } catch (err) {
       console.error("Error adding comment", err);
@@ -71,7 +71,7 @@ const CommentSection = ({ postId }) => {
               className="p-3 bg-white rounded-md dark:bg-gray-800 shadow-soft"
             >
               <p className="text-sm font-semibold">
-                {c.author?.username || "User"}
+                {c?.user?.username || "User"}
               </p>
               <p className="text-gray-600 dark:text-gray-300">
                 {c.content}

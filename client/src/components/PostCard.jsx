@@ -1,30 +1,52 @@
 import { useState } from "react";
 import CommentSection from "./CommentSection";
+import API from "../services/api";
 
 const PostCard = ({ post }) => {
-  const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(post.likedBy?.length || 0);
+  const [liked, setLiked] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikes((prev) => (liked ? prev - 1 : prev + 1));
+  const handleLike = async () => {
+    if (loading) return;
+
+    try {
+      setLoading(true);
+
+      const res = await API.post(`/api/likes/${post.id}`);
+      const message = res.data.message;
+
+      // ✅ Decide based on backend response
+      if (message === "LIKED") {
+        setLiked(true);
+        setLikes((prev) => prev + 1);
+      } else if (message === "UNLIKED") {
+        setLiked(false);
+        setLikes((prev) => Math.max(prev - 1, 0));
+      }
+
+    } catch (err) {
+      console.error("Like error", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="p-5 transition bg-white border dark:bg-gray-800 rounded-2xl shadow-soft border-brand-200 dark:border-gray-700 hover:shadow-lg">
       
-      {/* 🔥 BIG RESPONSIVE IMAGE */}
+      {/* 🖼️ Image */}
       {post.image && (
         <div className="mb-5 overflow-hidden rounded-xl">
-        <img
+     <img
   src={post.image}
   alt="post"
-  className="object-cover w-full h-56 transition sm:h-64 md:h-72 lg:h-80 rounded-xl hover:scale-105"
+  className="object-cover w-full h-60 md:h-64 lg:h-72 rounded-xl"
 />
         </div>
       )}
 
-      {/* 📄 CONTENT */}
+      {/* 📄 Content */}
       <div className="flex flex-col justify-between">
         
         <div>
@@ -35,7 +57,7 @@ const PostCard = ({ post }) => {
 
           {/* Meta */}
           <div className="flex items-center justify-between mb-3 text-sm text-gray-500 dark:text-gray-400">
-            <span>{post.author?.username}</span>
+            <span><b>Author:</b>:{post.author?.username}</span>
             <span>
               {new Date(post.createdAt).toLocaleDateString()}
             </span>
@@ -55,6 +77,7 @@ const PostCard = ({ post }) => {
 
           <button
             onClick={handleLike}
+            disabled={loading}
             className={`flex items-center gap-1 px-3 py-1 rounded-md transition 
               ${
                 liked
@@ -67,7 +90,7 @@ const PostCard = ({ post }) => {
         </div>
       </div>
 
-      {/* 💬 COMMENTS */}
+      {/* 💬 Comments */}
       <CommentSection postId={post.id} />
     </div>
   );

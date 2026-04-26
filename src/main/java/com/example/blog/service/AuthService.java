@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -73,6 +74,12 @@ public class AuthService {
 
         return token;
     }
+
+    public User getProfile(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+    }
+
 
     // ✅ helper
     private boolean isBlank(String value) {
